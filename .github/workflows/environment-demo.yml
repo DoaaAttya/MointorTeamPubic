@@ -1,0 +1,30 @@
+name: Environment Gate Demo
+
+on:
+  pull_request:
+    branches:
+      - development
+  push:
+    branches:
+      - development
+      - "release/**"
+      - main
+
+permissions: {}
+
+jobs:
+  pull-request-check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Demonstration check
+        run: echo "CI demo passed. No application code was built."
+
+  environment-gate:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name == 'development' && 'Development' || startsWith(github.ref, 'refs/heads/release/') && 'Testing' || 'Production' }}
+    steps:
+      - name: Demonstration only
+        run: echo "Environment approval gate passed. No deployment was performed."
